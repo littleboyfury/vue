@@ -135,6 +135,7 @@ export default class Watcher implements DepTarget {
     let value
     const vm = this.vm
     try {
+      // TODO 实际执行的代码 vm._update(vm._render(), hydrating)
       value = this.getter.call(vm, vm)
     } catch (e: any) {
       if (this.user) {

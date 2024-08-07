@@ -67,6 +67,7 @@ Vue.prototype.$mount = function (
         mark('compile')
       }
 
+      // TODO 运行时编译模板
       const { render, staticRenderFns } = compileToFunctions(
         template,
         {

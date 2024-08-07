@@ -152,6 +152,7 @@ export function mountComponent(
   vm.$el = el
   if (!vm.$options.render) {
     // @ts-expect-error invalid type
+    // TODO 首次创建一个空的虚拟 dom
     vm.$options.render = createEmptyVNode
     if (__DEV__) {
       /* istanbul ignore if */
@@ -197,6 +198,7 @@ export function mountComponent(
     }
   } else {
     updateComponent = () => {
+      //  TODO 更新生成 vnode， patch
       vm._update(vm._render(), hydrating)
     }
   }

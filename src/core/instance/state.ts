@@ -56,6 +56,7 @@ export function initState(vm: Component) {
   // Composition API
   initSetup(vm)
 
+  // TODO 把方法挂载到 this 上，并且 bind this
   if (opts.methods) initMethods(vm, opts.methods)
   if (opts.data) {
     initData(vm)
@@ -157,6 +158,7 @@ function initData(vm: Component) {
           vm
         )
     } else if (!isReserved(key)) {
+      // TODO 在 this 中挂载 data 属性 设置 getter 和 setter
       proxy(vm, `_data`, key)
     }
   }

@@ -56,6 +56,7 @@ export class Observer {
     def(value, '__ob__', this)
     if (isArray(value)) {
       if (!mock) {
+        // TODO 代理数组中的方法
         if (hasProto) {
           /* eslint-disable no-proto */
           ;(value as any).__proto__ = arrayMethods
@@ -151,6 +152,7 @@ export function defineReactive(
     val = obj[key]
   }
 
+  // TODO 递归收集依赖
   let childOb = shallow ? val && val.__ob__ : observe(val, false, mock)
   Object.defineProperty(obj, key, {
     enumerable: true,

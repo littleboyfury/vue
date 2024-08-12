@@ -369,6 +369,7 @@ export function once<T extends (...args: any[]) => any>(fn: T): T {
 }
 
 // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/is#polyfill
+// TODO 判断两个值是否不相等
 export function hasChanged(x: unknown, y: unknown): boolean {
   if (x === y) {
     return x === 0 && 1 / x !== 1 / (y as number)

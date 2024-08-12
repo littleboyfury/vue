@@ -160,6 +160,7 @@ export function defineReactive(
     get: function reactiveGetter() {
       const value = getter ? getter.call(obj) : val
       if (Dep.target) {
+        // TODO 添加依赖
         if (__DEV__) {
           dep.depend({
             target: obj,

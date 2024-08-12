@@ -71,7 +71,7 @@ function pruneCacheEntry(
 
 const patternTypes: Array<Function> = [String, RegExp, Array]
 
-// TODO defineComponent
+// TODO defineComponent KeepAlive 组件
 export default {
   name: 'keep-alive',
   abstract: true,
@@ -92,9 +92,11 @@ export default {
           tag,
           componentInstance
         }
+        // TODO 加入到数组末尾
         keys.push(keyToCache)
         // prune oldest entry
         if (this.max && keys.length > parseInt(this.max)) {
+          // TODO 缓存指定数量的组件，如果超过了，则去掉第一个
           pruneCacheEntry(cache, keys[0], keys, this._vnode)
         }
         this.vnodeToCache = null
@@ -152,9 +154,10 @@ export default {
             componentOptions.Ctor.cid +
             (componentOptions.tag ? `::${componentOptions.tag}` : '')
           : vnode.key
+      // TODO 已经缓存
       if (cache[key]) {
         vnode.componentInstance = cache[key].componentInstance
-        // make current key freshest
+        // TODO make current key freshest 把原来位置的移除，加入到队尾
         remove(keys, key)
         keys.push(key)
       } else {

@@ -66,6 +66,7 @@ export default class Watcher implements DepTarget {
 
   constructor(
     vm: Component | null,
+    // TODO 执行的函数，收集依赖的函数
     expOrFn: string | (() => any),
     cb: Function,
     options?: WatcherOptions | null,
@@ -128,6 +129,7 @@ export default class Watcher implements DepTarget {
   }
 
   /**
+   * TODO 代理执行，收集依赖
    * Evaluate the getter, and re-collect dependencies.
    */
   get() {
@@ -135,7 +137,7 @@ export default class Watcher implements DepTarget {
     let value
     const vm = this.vm
     try {
-      // TODO ʵ��ִ�еĴ��� vm._update(vm._render(), hydrating)
+      // TODO 执行收集依赖的函数 Dep.target 就是当前的 Watcher，里面的 getter 就是执行的函数
       value = this.getter.call(vm, vm)
     } catch (e: any) {
       if (this.user) {
@@ -244,6 +246,7 @@ export default class Watcher implements DepTarget {
    * This only gets called for lazy watchers.
    */
   evaluate() {
+    // TODO 重新获取值，并且缓存，缓存在 Watcher.value 中
     this.value = this.get()
     this.dirty = false
   }

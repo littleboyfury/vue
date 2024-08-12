@@ -180,6 +180,7 @@ export function getData(data: Function, vm: Component): any {
   }
 }
 
+// TODO 计算属性是懒加载
 const computedWatcherOptions = { lazy: true }
 
 function initComputed(vm: Component, computed: Object) {
@@ -197,6 +198,7 @@ function initComputed(vm: Component, computed: Object) {
 
     if (!isSSR) {
       // create internal watcher for the computed property.
+      // TODO 收集计算属性的依赖 computed 的函数 或者 get
       watchers[key] = new Watcher(
         vm,
         getter || noop,
@@ -209,6 +211,7 @@ function initComputed(vm: Component, computed: Object) {
     // component prototype. We only need to define computed properties defined
     // at instantiation here.
     if (!(key in vm)) {
+      // TODO 创建计算属性的 getter 和 setter
       defineComputed(vm, key, userDef)
     } else if (__DEV__) {
       if (key in vm.$data) {
@@ -259,10 +262,12 @@ function createComputedGetter(key) {
   return function computedGetter() {
     const watcher = this._computedWatchers && this._computedWatchers[key]
     if (watcher) {
+      // TODO 如果是脏数据，则需要重新读取函数中使用的变量
       if (watcher.dirty) {
         watcher.evaluate()
       }
       if (Dep.target) {
+        // 记录变更
         if (__DEV__ && Dep.target.onTrack) {
           Dep.target.onTrack({
             effect: Dep.target,
@@ -271,8 +276,10 @@ function createComputedGetter(key) {
             key
           })
         }
+        // TODO 添加依赖
         watcher.depend()
       }
+      // TODO 返回缓存的值
       return watcher.value
     }
   }
@@ -280,6 +287,7 @@ function createComputedGetter(key) {
 
 function createGetterInvoker(fn) {
   return function computedGetter() {
+    // TODO 如果不使用缓存，直接调用该方法即可
     return fn.call(this, this)
   }
 }

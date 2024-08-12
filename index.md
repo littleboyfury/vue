@@ -1,0 +1,76 @@
+- function Vue(options) {this._init(options)}
+- initMixin(Vue)
+  - Vue.prototype._init
+    - initLifecycle(vm) 忽略
+    - initEvents(vm) 忽略
+    - initRender(vm) 忽略
+    - callHook(vm, 'beforeCreate') beforeCreate 事件
+    - initInjections(vm) 初始化 injections
+    - initState(vm) 初始化 data
+      - initProps 初始化 props，根组件没有
+      - initMethods
+      - initData 没有 data 则 observe({}) 赋值给 data、
+        - proxy data -> _data
+        - observe(data)
+          - new Observer()
+            - constructor
+            - isArray -> this.observeArray(value)
+            - else -> defineReactive(value, key) 遍历对象的每个key，生成响应式对象
+              - observe(child)
+              - get: reactiveGetter
+                - Dep.target
+                - dep.depend()
+              - set: reactiveSetter
+                - getter.call(obj) hasChange(value, newVal)
+                - dep.notify()
+      - initComputed
+      - initWatch
+    - initProvide(vm) 初始化 provide
+    - callHook(vm, 'created)
+    - if vm.$options.el -> vm.$mount(vm.$options.el)
+- stateMixin(Vue)
+  - Object.defineProperty(Vue.prototype, '$data', dataDef)
+  - Object.defineProperty(Vue.prototype, '$props', propsDef) 
+  - Vue.prototype.$set = set
+  - Vue.prototype.$delete = del
+  - Vue.prototype.$watch = function () {}
+- eventsMixin(Vue)
+  - Vue.prototype.$on = function () {}
+  - Vue.prototype.$once = function () {}
+  - Vue.prototype.$off = function () {}
+  - Vue.prototype.$emit = function () {}
+- lifecycleMixin(Vue)
+  - Vue.prototype._update = function () {}
+  - Vue.prototype.$forceUpdate = function () {}
+  - Vue.prototype.$destroy = function () {}
+- renderMixin(Vue)
+  - Vue.prototype._o = markOnce
+  - Vue.prototype._n = toNumber
+  - Vue.prototype._s = toString
+  - Vue.prototype._l = renderList
+  - Vue.prototype._t = renderSlot
+  - Vue.prototype._q = looseEqual
+  - Vue.prototype._i = looseIndexOf
+  - Vue.prototype._m = renderStatic
+  - Vue.prototype._f = resolveFilter
+  - Vue.prototype._k = checkKeyCodes
+  - Vue.prototype._b = bindObjectProps
+  - Vue.prototype._v = createTextVNode
+  - Vue.prototype._e = createEmptyVNode
+  - Vue.prototype._u = resolveScopedSlots
+  - Vue.prototype._g = bindObjectListeners
+  - Vue.prototype._d = bindDynamicKeys
+  - Vue.prototype._p = prependModifier
+  - Vue.prototype.$nextTick = nextTick
+  - Vue.prototype._render = function() {}
+- Vue.prototype.$mount = return mountComponent(this, el)
+  - createEmptyVNode
+  - callHook(vm, 'beforeMount)
+  - updateComponent = () => {vm._update(vm._render(), hydrating)} 生成 vnode， patch vnode，第一次则生成 vnode然后生成真实 dom ,可以理解为 render 函数
+  - new Watcher(vm, updateComponent, noop, watcherOptions, true)
+    - this.getter = expOrFn -> updateComponent render 函数
+    - this.get()
+      - pushTarget(this) Dep.target = Wather
+      - this.getter.call(vm, vm) 执行 render 函数，收集依赖
+      - popTarget()
+  - callHook(vm, 'mounted)

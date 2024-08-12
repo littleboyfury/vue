@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Title</title>
+  <style>
+    * {
+      padding: 0;
+      margin: 0;
+    }
+  </style>
+</head>
+<body>
+<div id="app">
+  <div>{{a}}</div>
+  <div>{{b}}</div>
+  <div>{{c}}</div>
+  <div @click="test">hhh</div>
+</div>
+</body>
+<script type="module">
+  import Vue from './dist/vue.esm.browser.js'
+
+
+  window.vm = new Vue({
+    data() {
+      return {
+        a: 1,
+        b: 2
+      }
+    },
+    // watch: {
+    //   a(val) {
+    //     console.log('a', val)
+    //   }
+    // },
+    computed: {
+      c() {
+        return this.a + this.b
+      }
+    },
+    beforeCreate() {
+      console.log('beforeCreate')
+    },
+    created() {
+      console.log('created')
+    },
+    beforeMount() {
+      console.log('beforeMount')
+    },
+    mounted() {
+      console.log('mounted')
+    },
+    beforeUpdate() {
+      console.log('beforeUpdate')
+    },
+    updated() {
+      console.log('updated')
+    },
+    methods: {
+      test() {
+        this.a++
+        console.log('test')
+        return 'test'
+      }
+    }
+  })
+  vm.$mount('#app')
+  console.log(vm)
+</script>
+</html>

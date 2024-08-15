@@ -91,6 +91,7 @@ function flushSchedulerQueue() {
   for (index = 0; index < queue.length; index++) {
     watcher = queue[index]
     if (watcher.before) {
+      // TODO beforeUpdate 事件
       watcher.before()
     }
     id = watcher.id
@@ -136,6 +137,7 @@ function callUpdatedHooks(queue: Watcher[]) {
     const watcher = queue[i]
     const vm = watcher.vm
     if (vm && vm._watcher === watcher && vm._isMounted && !vm._isDestroyed) {
+      // TODO updated 生命周期
       callHook(vm, 'updated')
     }
   }
@@ -166,6 +168,7 @@ function callActivatedHooks(queue) {
  */
 export function queueWatcher(watcher: Watcher) {
   const id = watcher.id
+  // 拒绝重复渲染
   if (has[id] != null) {
     return
   }
@@ -194,6 +197,7 @@ export function queueWatcher(watcher: Watcher) {
       flushSchedulerQueue()
       return
     }
+    // 异步刷新
     nextTick(flushSchedulerQueue)
   }
 }

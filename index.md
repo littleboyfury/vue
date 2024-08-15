@@ -31,6 +31,9 @@
               - set: reactiveSetter
                 - getter.call(obj) hasChange(value, newVal)
                 - dep.notify()
+                  - watcher.update()
+                    - scheduler queueWatcher(this)
+                      - watcher.run() 调用更新
       - initComputed 计算属性实现原理
         - watchers = (vm._computedWatchers = Object.create(null)) 把监听加入到 vm 中
         - getter = isFunction(userDef) ? userDef : userDef.get
@@ -74,7 +77,11 @@
   - Vue.prototype.$off = function () {}
   - Vue.prototype.$emit = function () {}
 - lifecycleMixin(Vue)
+
+[//]: # (TODO _update patch 函数在这里)
   - Vue.prototype._update = function () {}
+    - vm.__patch__ = patch
+      - patch = createPatchFunction (vdom/patch.ts)
   - Vue.prototype.$forceUpdate = function () {}
   - Vue.prototype.$destroy = function () {}
 - renderMixin(Vue)
@@ -100,6 +107,8 @@
 - Vue.prototype.$mount = return mountComponent(this, el)
   - createEmptyVNode
   - callHook(vm, 'beforeMount)
+
+[//]: # (TODO _update patch 函数在这里)
   - updateComponent = () => {vm._update(vm._render(), hydrating)} 生成 vnode， patch vnode，第一次则生成 vnode然后生成真实 dom ,可以理解为 render 函数
   - new Watcher(vm, updateComponent, noop, watcherOptions, true)
     - this.getter = expOrFn -> updateComponent render 函数
@@ -108,3 +117,30 @@
       - this.getter.call(vm, vm) 执行 render 函数，收集依赖
       - popTarget()
   - callHook(vm, 'mounted)
+
+- nextTick
+  - Promise.resolve().then()
+    - timerFunc = () => {p.then(flushCallbacks)}
+    - is(isIOS) setTimeout(noop)
+  - MutationObserve
+    - const observer = new MutationObserve(flushCallbacks)
+    - const textNode = document.createTextNode(String(counter))
+    - observer.observe(textNode, { characterData: true})
+    - timerFunc = () => {counter = (counter + 1) % 2; textNode.data = String(counter)}
+  - setImmediate
+    - timerFunc = () => {setImmediate(flushCallbacks)}
+  - setTimeout
+    - timerFunc = () => {setTimeout(flushCallbacks, 0)}
+
+- queueWatcher
+  - id = watcher.id
+  - has[id] return 同样的 watcher 不会重复渲染
+  - queue.push(watcher)
+  - nextTick(flushSchedulerQueue)
+    - queue.sort()
+    - for queue
+      - watcher = queue[i]
+      - watcher.before beforeUpdate 事件 或者 beforeUpdate 事件
+      - watcher.run()
+    - callActivatedHooks(activatedQueue) 调用 activated 回调
+    - callUpdatedHooks(updatedQueue) 调用 updated 回调

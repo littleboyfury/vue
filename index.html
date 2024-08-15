@@ -29,11 +29,22 @@
         b: 2
       }
     },
-    // watch: {
-    //   a(val) {
-    //     console.log('a', val)
-    //   }
-    // },
+    watch: {
+      a: [
+        {
+          handler: (newVal, oldVal) => {
+            console.log(newVal, oldVal, '2')
+          },
+          immediate: true,
+          deep: true
+        },
+        {
+          handler: (newVal, oldVal) => {
+            console.log(newVal, oldVal, '1')
+          }
+        },
+      ]
+    },
     computed: {
       c() {
         return this.a + this.b

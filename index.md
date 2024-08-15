@@ -10,11 +10,19 @@
       - initProps 初始化 props，根组件没有
       - initMethods
       - initData 没有 data 则 observe({}) 赋值给 data、
-        - proxy data -> _data
+        - proxy 逆序遍历 data，data -> _data
+        - 如果有相同的 methods ，则会发出 methods 已经在 data 中定义 警告
+        - 如果有相同的 props，则会发出 data 已经在 props 上定义
+        - 否则，则挂载到 _data 中
         - observe(data)
           - new Observer()
             - constructor
-            - isArray -> this.observeArray(value)
+            - isArray 
+              - 改变原有数组的 __proto__ -> arrayMethods
+                - arrayMethods 中重写了 push pop shift unshift splice sort reverse
+                - 调用这些方法，会去调用对象的 ob.dep.notify() 通知更新
+              - this.observeArray(value)
+                - 循环遍历每个元素，调用 observe(value[i])
             - else -> defineReactive(value, key) 遍历对象的每个key，生成响应式对象
               - observe(child)
               - get: reactiveGetter
@@ -23,8 +31,28 @@
               - set: reactiveSetter
                 - getter.call(obj) hasChange(value, newVal)
                 - dep.notify()
-      - initComputed
+      - initComputed 计算属性实现原理
+        - watchers = (vm._computedWatchers = Object.create(null)) 把监听加入到 vm 中
+        - getter = isFunction(userDef) ? userDef : userDef.get
+        - watchers[key] = new Watcher(vm, getter, noop, {lazy: true}) 创建 watcher 对象，并且懒加载
+        - defineComputed(vm, key, userDef) 循环遍历 key 调用 
+          - sharedPropertyDefinition 设置对应的 getter 和 setter
+            - getter
+              - watcher = this._computedWatchers[key]
+              - watcher.dirty 
+                - watcher.evaluate() 表明值有变动，需要重新获取值
+                  - this.value = this.get()
+                  - this.dirty = false
+              - Dep.target && watcher.depend() 添加依赖
+              - return watcher.value 返回缓存的值
+            - setter = userDef.set || noop
+          - Object.defineProperty(vm, key, sharedPropertyDefinition)
       - initWatch
+        - isArray
+          - 遍历每个节点 调用 createWatcher(vm, key, handler[i])
+        - else
+          - createWatcher(vm, key, handler)
+            - return vm.$watch(key, handler, options)
     - initProvide(vm) 初始化 provide
     - callHook(vm, 'created)
     - if vm.$options.el -> vm.$mount(vm.$options.el)
@@ -33,8 +61,14 @@
   - Object.defineProperty(Vue.prototype, '$props', propsDef) 
   - Vue.prototype.$set = set
   - Vue.prototype.$delete = del
-  - Vue.prototype.$watch = function () {}
-- eventsMixin(Vue)
+  - Vue.prototype.$watch = function (expOrFn, cb, options) {}
+    - if isPlainObject(cb)
+      - return createWatcher(vm, expOrFn, cb, options)
+    - watcher = new Watcher(vm, expOrFn, cb, options)
+    - options.immediate === true
+      - handler 执行该方法
+    - return unwatchFn()
+      - watcher.teardown()- eventsMixin(Vue)
   - Vue.prototype.$on = function () {}
   - Vue.prototype.$once = function () {}
   - Vue.prototype.$off = function () {}

@@ -66,9 +66,9 @@ export default class Watcher implements DepTarget {
 
   constructor(
     vm: Component | null,
-    // TODO 执行的函数，收集依赖的函数
+    // TODO watch 的 key or 执行的函数，收集依赖的函数
     expOrFn: string | (() => any),
-    cb: Function,
+    cb: Function, // watch 的回调
     options?: WatcherOptions | null,
     isRenderWatcher?: boolean
   ) {
@@ -113,6 +113,7 @@ export default class Watcher implements DepTarget {
     if (isFunction(expOrFn)) {
       this.getter = expOrFn
     } else {
+      // watch 单纯遍历 watch 的 key 用于收集依赖
       this.getter = parsePath(expOrFn)
       if (!this.getter) {
         this.getter = noop
@@ -235,6 +236,7 @@ export default class Watcher implements DepTarget {
             info
           )
         } else {
+          // 执行 watch 的回调
           this.cb.call(this.vm, value, oldValue)
         }
       }
